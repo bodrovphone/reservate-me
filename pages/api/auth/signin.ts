@@ -39,11 +39,17 @@ export default async function handler(
     return res.status(400).json({ errors });
   }
 
-  const userWithEmail = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+  let userWithEmail;
+
+  try {
+    userWithEmail = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  } catch (e) {
+    console.error('error', e);
+  }
 
   if (!userWithEmail) {
     return res.status(401).json({ message: 'User not found' });

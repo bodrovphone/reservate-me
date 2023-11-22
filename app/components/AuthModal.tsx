@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import AuthModalInputs from './AuthModalnputs';
+import useAuth from '../hooks/useAuth';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -31,6 +32,8 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
     return isSignedIn ? signinContent : sinupContent;
   };
 
+  const { signIn } = useAuth();
+
   const [inputs, setInputs] = React.useState({
     firstName: '',
     lastName: '',
@@ -39,6 +42,30 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
     phone: '',
     city: '',
   });
+
+  const [disabled, setDisabled] = React.useState(true);
+
+  React.useEffect(() => {
+    if (isSignedIn) {
+      if (inputs.password && inputs.email) {
+        return setDisabled(false);
+      }
+    } else {
+      if (Object.values(inputs).every(Boolean)) {
+        return setDisabled(false);
+      }
+    }
+    setDisabled(true);
+  }, [inputs]);
+
+  const handleClick = () => {
+    if (isSignedIn) {
+      signIn({
+        email: inputs.email,
+        password: inputs.password,
+      });
+    }
+  };
 
   return (
     <div>
@@ -75,7 +102,11 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
                 setInputs={setInputs}
                 isSignedIn={isSignedIn}
               />
-              <button className="uppercase bg-red-600 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-grey-400">
+              <button
+                className="uppercase bg-red-600 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
+                disabled={disabled}
+                onClick={handleClick}
+              >
                 {renderContentIfSignedIn('Sign in', 'Create Account')}
               </button>
             </div>
