@@ -1,10 +1,11 @@
-import NavBar from './components/NavBar'
-import './globals.css'
+import NavBar from './components/NavBar';
+import AuthContext from './context/AuthContext';
+import './globals.css';
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -12,16 +13,18 @@ export default function RootLayout({
         <head /> will contain the components returned by the nearest parent
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
-      
+
       <body>
-      <main className="bg-gray-100 min-h-screen w-screen text-black">
-  <main className="max-w-screen-2xl m-auto bg-white">
-    {/* NAVBAR */}
-    <NavBar />
-        {children}
+        <main className="bg-gray-100 min-h-screen w-screen text-black">
+          <AuthContext>
+            <main className="max-w-screen-2xl m-auto bg-white">
+              {/* NAVBAR */}
+              <NavBar />
+              {children}
+            </main>
+          </AuthContext>
         </main>
-        </main>
-        </body>
+      </body>
     </html>
-  )
+  );
 }

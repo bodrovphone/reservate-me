@@ -3,6 +3,7 @@ import validator from 'validator';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import * as jose from 'jose';
+import { setCookie } from 'cookies-next';
 
 const prisma = new PrismaClient();
 
@@ -26,7 +27,7 @@ export default async function handler(
       errorMessage: 'Last name must be between 2 and 20 characters',
     },
     {
-      valid: validator.isMobilePhone(phone),
+      valid: validator.isNumeric(phone),
       errorMessage: 'Phone number must be a valid US phone number',
     },
     {
@@ -95,7 +96,20 @@ export default async function handler(
       .setExpirationTime('2h')
       .sign(secret);
 
-    res.status(200).json({ token });
+    setCookie('jwt', token, {
+      req,
+      res,
+      maxAge: 60 * 6 * 24,
+      secure: false,
+    });
+
+    return res.status(200).json({
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      phone: user.phone,
+      city: user.city,
+    });
   } catch (error) {
     res.status(408).json({ error });
   }

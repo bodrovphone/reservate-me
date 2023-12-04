@@ -3,6 +3,7 @@ import validator from 'validator';
 import { PrismaClient } from '@prisma/client';
 import * as jose from 'jose';
 import bcrypt from 'bcrypt';
+import { setCookie } from 'cookies-next';
 
 const prisma = new PrismaClient();
 
@@ -39,10 +40,10 @@ export default async function handler(
     return res.status(400).json({ errors });
   }
 
-  let userWithEmail;
+  let user;
 
   try {
-    userWithEmail = await prisma.user.findUnique({
+    user = await prisma.user.findFirstOrThrow({
       where: {
         email,
       },
@@ -51,14 +52,11 @@ export default async function handler(
     console.error('error', e);
   }
 
-  if (!userWithEmail) {
+  if (!user) {
     return res.status(401).json({ message: 'User not found' });
   }
 
-  const passwordMatches = await bcrypt.compare(
-    password,
-    userWithEmail.password
-  );
+  const passwordMatches = await bcrypt.compare(password, user.password);
 
   if (!passwordMatches) {
     return res.status(401).json({ message: 'Password is incorrect' });
@@ -68,11 +66,24 @@ export default async function handler(
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
   const token = await new jose.SignJWT({
-    email: userWithEmail.email,
+    email: user.email,
   })
     .setProtectedHeader({ alg })
     .setExpirationTime('2h')
     .sign(secret);
 
-  res.status(200).json({ token });
+  setCookie('jwt', token, {
+    req,
+    res,
+    maxAge: 60 * 6 * 24,
+    secure: false,
+  });
+
+  return res.status(200).json({
+    firstName: user.first_name,
+    lastName: user.last_name,
+    email: user.email,
+    phone: user.phone,
+    city: user.city,
+  });
 }
