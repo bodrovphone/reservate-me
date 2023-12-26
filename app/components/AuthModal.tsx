@@ -29,7 +29,7 @@ export default function AuthModal({ isSignedIn }: { isSignedIn: boolean }) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  console.log('noticeMeNow', error, loading, data);
+  //   console.log('noticeMeNow', error, loading, data);
 
   const renderContentIfSignedIn = (
     signinContent: string,

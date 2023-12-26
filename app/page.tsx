@@ -8,18 +8,24 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const fetchRestaurants = async (): Promise<RestaurantCardType[]> => {
-  const restaurants = await prisma.restaurant.findMany({
-    select: {
-      id: true,
-      name: true,
-      main_image: true,
-      slug: true,
-      cuisine: true,
-      location: true,
-      price: true,
-      reviews: true,
-    },
-  });
+  let restaurants: RestaurantCardType[] = [];
+
+  try {
+    restaurants = await prisma.restaurant.findMany({
+      select: {
+        id: true,
+        name: true,
+        main_image: true,
+        slug: true,
+        cuisine: true,
+        location: true,
+        price: true,
+        reviews: true,
+      },
+    });
+  } catch (error) {
+    console.log('Shit happens', error);
+  }
 
   return restaurants;
 };

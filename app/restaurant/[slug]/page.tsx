@@ -22,6 +22,8 @@ const fetchRestaurantBySlug = async (slug: string): Promise<Restaurant> => {
       description: true,
       reviews: true,
       slug: true,
+      open_time: true,
+      close_time: true,
     },
   });
 
@@ -39,6 +41,8 @@ interface Restaurant {
   images: string[];
   description: string;
   reviews: Review[];
+  open_time: string;
+  close_time: string;
 }
 
 export default async function RestaurantDetailsPage({
@@ -65,7 +69,11 @@ export default async function RestaurantDetailsPage({
         <Reviews reviews={restaurant.reviews} />
         {/* REVIEWS */}
       </div>
-      <ReservationCard />
+      <ReservationCard
+        openTime={restaurant.open_time}
+        closeTime={restaurant.close_time}
+        slug={restaurant.slug}
+      />
     </>
   );
 }
